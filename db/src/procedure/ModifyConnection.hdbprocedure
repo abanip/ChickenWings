@@ -1,0 +1,65 @@
+PROCEDURE "ModifyConnection"(
+	IN im_flight NVARCHAR(6),
+	IN im_fromap NVARCHAR(3),
+	IN im_toap NVARCHAR(3),
+	IN im_dept TIME,
+	IN im_arrt TIME,
+	IN im_miles INTEGER,
+	IN im_sstartd DATE,
+	IN im_sendd DATE,
+	IN im_esprice DECIMAL(12,2),
+	IN im_epprice DECIMAL(12,2),
+	IN im_bsprice DECIMAL(12,2),
+	IN im_bpprice DECIMAL(12,2),
+	IN im_fsprice DECIMAL(12,2),
+	IN im_fpprice DECIMAL(12,2),
+	OUT ex_error NVARCHAR(100))
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER
+AS
+BEGIN
+	declare noc INTEGER;
+	-- Log variables
+	declare log_level integer = 0;
+	declare log_err_level integer = -1;
+	declare log_comment nvarchar(1000);
+	
+	SELECT count("FLIGHT")
+		INTO noc
+		FROM "Connection"
+		WHERE "FLIGHT" = im_flight;
+		
+	IF (:noc = 0) THEN
+		ex_error := 'ERROR: Connection ' || :im_flight || ' does not exists!';
+
+		-- Create Log Entry
+		log_comment = ex_error;
+		call "CreateLog" (::CURRENT_OBJECT_NAME, log_err_level, log_comment, 0);	
+		
+	ELSE
+		-- Update record
+		UPDATE "Connection"
+		SET "FROMAP" = im_fromap, 
+			"TOAP" = im_toap, 
+			"DEPT" = im_dept,
+			"ARRT" = im_arrt,
+			"MILES" = im_miles,
+			"SSTARTD" = im_sstartd,
+			"SENDD" = im_sendd,
+			"ESPRICE" = im_esprice,
+			"EPPRICE" = im_epprice,
+			"BSPRICE" = im_bsprice,
+			"BPPRICE" = im_bpprice,
+			"FSPRICE" = im_fsprice,
+			"FPPRICE" = im_fpprice,
+			"CHANGE.USER" = CURRENT_USER,
+			"CHANGE.TIMESTAMP" = CURRENT_TIMESTAMP			
+		WHERE "FLIGHT" = im_flight;
+		
+		-- Create Log Entry
+		log_comment = 'INFO: Record updated, FLIGHT=' || im_flight || ' FROMAP=' || im_fromap || ' TOAP=' || im_toap;
+		log_level = log_level + 1;
+		call "CreateLog" (::CURRENT_OBJECT_NAME, log_level, log_comment, 1);
+		
+	END IF;
+END;

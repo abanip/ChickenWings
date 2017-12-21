@@ -1,0 +1,39 @@
+PROCEDURE "DeleteConnection" (
+	IN im_flight INTEGER,
+	OUT ex_error NVARCHAR(100))
+LANGUAGE SQLSCRIPT SQL
+SECURITY INVOKER AS
+BEGIN
+	-- Declare variables
+	declare noc integer;
+	-- Log variables
+	declare log_level integer = 0;
+	declare log_err_level integer = -1;
+	declare log_comment nvarchar(1000);
+	
+	-- Check if the entry exist
+	SELECT COUNT("FLIGHT") INTO noc
+	FROM "Connection"
+	WHERE "FLIGHT" = im_flight;
+	
+	-- Raise an Error
+	if :noc = 0 then
+		ex_error := 'ERROR: Connection ' || :im_flight || ' does not exist!';
+
+		-- Create Log Entry
+		log_comment = ex_error;
+		call "CreateLog" (::CURRENT_OBJECT_NAME, log_err_level, log_comment, 0);	
+		
+	-- Delete the Entry	
+	else
+		DELETE FROM "Connection"
+		WHERE "FLIGHT" = im_flight;
+
+		-- Create Log Entry
+		log_comment = 'INFO: Record Deleted, FLIGHT=' || im_flight;
+		log_level = log_level + 1;
+		call "CreateLog" (::CURRENT_OBJECT_NAME, log_level, log_comment, 1);
+		
+	end if;
+	
+END

@@ -1,0 +1,11 @@
+FUNCTION "PriorYear" ( )
+       RETURNS PRIOR_YEAR VARCHAR(4)
+       LANGUAGE SQLSCRIPT 
+       SQL SECURITY INVOKER AS 
+BEGIN 
+
+ SELECT year(now())+1 
+ INTO PRIOR_YEAR 
+ FROM dummy;
+
+END;

@@ -1,0 +1,298 @@
+using CWTypes.BaseT;
+using CWTypes.ChangeT;
+
+/*
+* Data Type Definition
+*/
+type NameT		: String(20);
+type PhoneT		: String(15);
+type EmailT		: String(30);
+type CityT		: String(20);
+type CountryT	: String(25);
+type CodeT		: String(3);
+type FlightT	: String(6);
+type PriceT		: Decimal(12,2);
+type ModelT		: String(10);
+type SeatT		: String(4);
+
+entity Airport {
+    key CODE      : String(3);		// Airport IATA Code
+        NAME      : String(50); 	// Airport Name
+        CITY      : CityT;			// Airport City
+        COUNTRY   : CountryT default 'USA'; // Airport Country
+        TIMEZONE  : String(3);		// Airport Time Zone
+        LATITUDE  : Decimal(12, 6) not null; // Coordinates: Latitude
+        LONGITUDE : Decimal(12, 6) not null; // Coordinates: Longitude
+        LOCATION  : /* Spatial Data */ hana.ST_POINT(4326) 
+        			= new ST_POINT ('POINT ('||LONGITUDE || ' ' || LATITUDE || ')',4326); //Geo Cordinates: Point 4326
+        CHANGE    : ChangeT; // Technical Columns
+}
+technical configuration {
+    column store;		//Column Table
+    auto merge;			//Enable auto merge
+    unload priority 5;  //Standard settings
+    group type app group subtype ChickenWings group name master;
+};
+
+//Plane Details
+entity Plane 
+{
+    key REGNO      : Integer;			//Registration Number 
+        MODEL      : String(10);		//Model Name 
+        MAKE       : String(20);		//Manufacturer 
+        TYPE       : String(20);		//Type of Aircraft 
+        YEAR       : Integer;			//Year of Manufacture 
+        REGDATE	   : LocalDate; 		//Registration Date 
+        MAXSEAT    : Integer;			//Maximum Seating Capacity 
+        ECOSEAT    : Integer;			//No of Economy Class Seats 
+        BUSSEAT    : Integer;			//No of Business Class Seats 
+        FIRSEAT    : Integer;			//No of First Class Seats 
+		CHANGE	   : ChangeT;     //Last Change Timestamp and User        
+}
+technical configuration {
+    column store;		//Column Table
+    auto merge;			//Enable auto merge
+    unload priority 5;  //Standard settings
+    group type app group subtype ChickenWings group name master;
+};
+
+// Crew Details
+entity Crew  
+{
+    key CREWID  : Integer; 			//Customer ID 
+        FNAME   : NameT;			//First Name 
+        LNAME   : NameT;			//Last Name 
+        MOBILE  : PhoneT;			//Mobile/Cell Number 
+        EMAIL   : EmailT;			//Email 
+        COUNTRY : CountryT;			//Country of Residence
+        ROLE    : String(20);		//Job/Role of Crew 
+		CHANGE	: ChangeT;	//Last Change Timestamp and User        
+}
+technical configuration {
+    column store;		//Column Table
+    auto merge;			//Enable auto merge
+    unload priority 5;  //Standard settings
+    group type app group subtype ChickenWings group name master;
+};
+
+//Customer Details 
+entity Customer 
+{
+    key CUSTID  : Integer;			//Customer ID 
+        FNAME   : NameT;			//First Name 
+        LNAME   : NameT;			//Last Name 
+        MOBILE  : PhoneT;			//Mobile/Cell Number 
+        EMAIL   : EmailT;			//Email 
+        COUNTRY : CountryT; 		//Country of Residence 
+        FLYERID : String(20);		//Frequent Flyer ID 
+		CHANGE	: ChangeT;	//Last Change Timestamp and User        
+}
+technical configuration {
+    column store;		//Column Table
+    auto merge;			//Enable auto merge
+    unload priority 5;  //Standard settings
+    group type app group subtype ChickenWings group name master;
+};
+
+//Seat Details 
+entity Seat 
+{
+    key MODEL	: ModelT; 			//Plane Model 
+    key SEAT	: SeatT; 			//Seat Number 
+        CLASS	: String(10); 		//Class of Seat: Economy, Business 
+        STYPE	: String(15); 		//Type of Seating: Window/Isle 
+		CHANGE	: ChangeT;    //Last Change Timestamp and User        
+}
+technical configuration {
+    column store;		//Column Table
+    auto merge;			//Enable auto merge
+    unload priority 5;  //Standard settings
+    group type app group subtype ChickenWings group name master;
+};
+
+//Price Calendar 
+entity PriceCalendar 
+{
+    key CDATE	: LocalDate ;		//Date 
+        RATE	: String(10);		//Standard or Peak Rate for Pricing 
+        SEASON	: String(20);		//Season used for Pricing 
+		CHANGE	: ChangeT;    //Last Change Timestamp and User        
+}
+technical configuration {
+    column store;		//Column Table
+    auto merge;			//Enable auto merge
+    unload priority 5;  //Standard settings
+    group type app group subtype ChickenWings group name master;
+};
+
+//Connection Details 
+entity Connection 
+{
+    key FLIGHT	: FlightT;			//Flight Number 
+        FROMAP	: CodeT;			//Origin Airport 
+        TOAP    : CodeT;			//Destination Airport 
+        DEPT    : LocalTime;		//Scheduled Departure Time 
+        ARRT	: LocalTime;		//Scheduled Arrival Time
+        SSTARTD	: LocalDate;		//Service Start Date 
+        SENDD	: LocalDate;		//Service End Date 
+        ESPRICE	: PriceT; 			//Economy Class Standard Price 
+        EPPRICE	: PriceT; 			//Economy Class Peak Price 
+        BSPRICE	: PriceT; 			//Business Class Standard Price 
+        BPPRICE	: PriceT; 			//Business Class Peak Price 
+        FSPRICE	: PriceT; 			//First Class Standard Price 
+        FPPRICE	: PriceT; 			//First Class Peak Price
+        MILES	: Integer;			//Distance in Miles         
+		CHANGE	: ChangeT;    //Last Change Timestamp and User        
+        // Associations
+        _FromAirport  : association[*, 0..1] to Airport 
+        	on _FromAirport.CODE = FROMAP;
+        _ToAirport    : association[*, 0..1] to Airport 
+        	on _ToAirport.CODE = TOAP;
+}
+technical configuration {
+    column store;		//Column Table
+    auto merge;			//Enable auto merge
+    unload priority 5;  //Standard settings
+    group type app group subtype ChickenWings group name master;
+};
+
+//Flight Details 
+entity Flight 
+{
+    key FLIGHT	: FlightT;			//Flight Number 
+    key FDATE	: LocalDate;		//Flight Date 
+        PLANE	: Integer;			//Plane RegNo 
+        PILOT1	: Integer;			//Pilot 
+        PILOT2	: Integer;			//Co-Pilot 
+        CREW1	: Integer;			//Crew 1 
+        CREW2	: Integer;			//Crew 2 
+        CREW3	: Integer;			//Crew 3 
+        DEPT	: LocalTime; 		//Actual Departure Time 
+        ARRT	: LocalTime; 		//Actual Arrival Time 
+        STATUS	: String(10);		//Flight Status 
+		CHANGE	: ChangeT;	//Last Change Timestamp and User        
+		// Associations 
+        _Connection    : association[*, 0..1] to Connection     
+        	on _Connection.FLIGHT = FLIGHT;
+        _Plane		   : association[*, 0..1] to Plane  		
+        	on _Plane.REGNO = PLANE;
+        _Pilot1        : association[*, 0..1] to Crew           
+        	on _Pilot1.CREWID = PILOT1;
+        _Pilot2        : association[*, 0..1] to Crew           
+        	on _Pilot2.CREWID = PILOT2;
+        _Crew1         : association[*, 0..1] to Crew           
+        	on _Crew1.CREWID = CREW1;
+        _Crew2         : association[*, 0..1] to Crew           
+        	on _Crew2.CREWID = CREW2;
+        _Crew3         : association[*, 0..1] to Crew           
+        	on _Crew3.CREWID = CREW3;
+}
+technical configuration {
+    column store;		//Column Table
+    auto merge;			//Enable auto merge
+    unload priority 5;  //Standard settings
+    group type app group subtype ChickenWings group name master;
+};
+
+//Booking Details 
+entity Booking 
+{
+    key FLIGHT    : FlightT;		//Flight Number 
+    key FDATE     : LocalDate; 		//Flight Date 
+    key MODEL     : ModelT;			//Plane Model
+    key SEAT      : ModelT; 		//Seat Number 
+        CUSTID    : Integer;		//Customer ID 
+        STDPRICE  : PriceT; 		//Base Price 
+        BOOKPRICE : PriceT; 		//Book Price 
+        FEES      : PriceT; 		//Surcharges/Fees 
+        DISCOUNT  : PriceT; 		//Discount 
+        TAX       : PriceT; 		//Tax 
+        TOTAL     : PriceT; 		//Total Amount Charged 
+        PAYMENT   : String(15); 	//Mode of Payment CREDIT, CASH, POINTS
+        STATUS    : String(10);		//Booking Status Hold/Confirmed/Available 
+        PASSENGER : String(20); 	//Name of the Passnger 
+        CHECKIN   : String(1);		//Check-in Status 
+		CHANGE	  : ChangeT;  //Last Change Timestamp and User        
+		// Associations
+        _Flight   : association[*, 0..1] to Flight {FLIGHT,FDATE};
+        _Seat     : association[*, 0..1] to Seat {MODEL, SEAT};
+        _Customer : association[*, 0..1] to Customer {CUSTID};
+}
+technical configuration {
+    column store;		//Column Table
+    auto merge;			//Enable auto merge
+    unload priority 5;  //Standard settings
+    group type app group subtype ChickenWings group name transaction;
+};
+
+//Create SQL View
+view OpenSeats as SELECT FROM Booking
+{
+		FLIGHT, 
+		FDATE,
+		COUNT(SEAT) as TOTAL_SEATS
+} WHERE STATUS = 'AVAILABLE'
+  GROUP BY FLIGHT, 
+		 FDATE
+  HAVING COUNT(SEAT) > 2
+  ORDER BY FLIGHT ASC, FDATE DESC
+;
+
+//Create Table Function
+view OpenSeats2 with parameters P_DATE : LocalDate
+as SELECT FROM Booking
+{
+		FLIGHT, 
+		FDATE,
+		COUNT(SEAT) as TOTAL_SEATS
+} WHERE STATUS = 'AVAILABLE'
+	AND FDATE = :P_DATE
+  GROUP BY FLIGHT, 
+		 FDATE
+  HAVING COUNT(SEAT) > 2
+  ORDER BY FLIGHT ASC, FDATE DESC
+;
+
+entity AirportNew {
+    key CODE      : type of BaseT.CodeT;	// Airport IATA Code
+        NAME      : String(50); 			// Airport Name
+        CITY      : type of BaseT.CityT;	// Airport City
+        COUNTRY   : type of BaseT.CountryT default 'USA'; // Airport Country
+        TIMEZONE  : String(3);			// Airport Time Zone
+        LATITUDE  : Decimal(12, 6) not null; // Coordinates: Latitude
+        LONGITUDE : Decimal(12, 6) not null; // Coordinates: Longitude
+        LOCATION  : /* Spatial Data */ hana.ST_POINT(4326) 
+        			= new ST_POINT ('POINT ('||LONGITUDE || ' ' || LATITUDE || ')',4326); //Geo Cordinates: Point 4326
+        CHANGE    : ChangeT; // Technical Columns
+}
+technical configuration {
+    column store;		//Column Table
+    auto merge;			//Enable auto merge
+    unload priority 5;  //Standard settings
+    group type app group subtype ChickenWings group name master;
+};
+
+//Connection Details 
+entity Connection2 
+{
+    key FLIGHT	: FlightT;			//Flight Number 
+        /* Managed Association */
+        FROMAP	: association[*, 1] to Airport; //Origin Airport
+        TOAP	: CodeT;	//Destination Airport   
+        DEPT    : LocalTime;		//Scheduled Departure Time 
+        ARRT	: LocalTime;		//Scheduled Arrival Time
+        SSTARTD	: LocalDate;		//Service Start Date 
+        SENDD	: LocalDate;		//Service End Date 
+        ESPRICE	: PriceT; 			//Economy Class Standard Price 
+        EPPRICE	: PriceT; 			//Economy Class Peak Price 
+        BSPRICE	: PriceT; 			//Business Class Standard Price 
+        BPPRICE	: PriceT; 			//Business Class Peak Price 
+        FSPRICE	: PriceT; 			//First Class Standard Price 
+        FPPRICE	: PriceT; 			//First Class Peak Price
+        MILES	: Integer;			//Distance in Miles         
+		CHANGE	: ChangeT;    //Last Change Timestamp and User        
+
+        // Unmanaged Associations
+        _ToAirport    : association[*, 1] to Airport 
+        	on _ToAirport.CODE = TOAP;
+}

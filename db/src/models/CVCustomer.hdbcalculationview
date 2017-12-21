@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:Calculation="http://www.sap.com/ndb/BiModelCalculation.ecore" id="CVCustomer" applyPrivilegeType="NONE" dataCategory="DIMENSION" dimensionType="STANDARD" schemaVersion="3.0" defaultClient="$$client$$" outputViewType="Projection" cacheInvalidationPeriod="NONE" enforceSqlExecution="false">
+<descriptions defaultDescription="CVCustomer"/>
+<localVariables/>
+<variableMappings/>
+<dataSources>
+  <DataSource id="Customer">
+    <resourceUri>Customer</resourceUri>
+  </DataSource>
+</dataSources>
+<calculationViews/>
+<logicalModel id="Customer">
+  <attributes>
+    <attribute id="CUSTID" order="1" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="Customer ID"/>
+      <keyMapping columnObjectName="Customer" columnName="CUSTID"/>
+    </attribute>
+    <attribute id="FNAME" order="2" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="First Name"/>
+      <keyMapping columnObjectName="Customer" columnName="FNAME"/>
+    </attribute>
+    <attribute id="LNAME" order="3" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="Last Name"/>
+      <keyMapping columnObjectName="Customer" columnName="LNAME"/>
+    </attribute>
+    <attribute id="MOBILE" order="4" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="Cell Phone"/>
+      <keyMapping columnObjectName="Customer" columnName="MOBILE"/>
+    </attribute>
+  
+    <attribute id="EMAIL" order="5" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="Email"/>
+      <keyMapping columnObjectName="Customer" columnName="EMAIL"/>
+    </attribute>
+    <attribute id="COUNTRY" order="6" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="Country"/>
+      <keyMapping columnObjectName="Customer" columnName="COUNTRY"/>
+    </attribute>
+    <attribute id="FLYERID" order="7" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="Frequent Flyer ID"/>
+      <keyMapping columnObjectName="Customer" columnName="FLYERID"/>
+    </attribute></attributes>
+  <calculatedAttributes/>
+  <baseMeasures/>
+  <calculatedMeasures/>
+  <restrictedMeasures/>
+</logicalModel>
+<layout>
+  <shapes>
+    <shape expanded="true" modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
+      <upperLeftCorner x="40" y="85"/>
+    </shape>
+  </shapes>
+</layout>
+</Calculation:scenario>

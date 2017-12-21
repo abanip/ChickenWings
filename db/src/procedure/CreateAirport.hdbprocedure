@@ -1,0 +1,65 @@
+PROCEDURE "CreateAirport" (
+	IN im_code NVARCHAR(3),
+	IN im_name NVARCHAR(50),
+	IN im_city NVARCHAR(20),
+	IN im_country NVARCHAR(20),
+	IN im_timezone NVARCHAR(3),
+	IN im_latitude DECIMAL(12,6),
+	IN im_longitude DECIMAL(12,6),
+	OUT ex_error NVARCHAR(100))
+LANGUAGE SQLSCRIPT SQL
+SECURITY INVOKER AS
+BEGIN
+	-- Declare variables
+	declare noc integer;
+	
+	-- Log variables
+	declare log_level integer = 0;
+	declare log_err_level integer = -1;
+	declare log_comment nvarchar(1000);
+	
+	-- Check if the entry exist
+	SELECT COUNT(im_code) INTO noc
+	FROM "Airport"
+	WHERE "CODE" = im_code;
+	
+	-- Raise an Error
+	if :noc > 0 then
+		ex_error := 'ERROR: Airport ' || im_code || ' already exists!';
+		
+		-- Create Log Entry
+		log_comment = ex_error;
+		call "CreateLog" (::CURRENT_OBJECT_NAME, log_err_level, log_comment, 0);
+	
+	-- Insert the Record
+	else
+		INSERT INTO "Airport" (
+			CODE,
+			NAME,
+			CITY,
+			COUNTRY,
+			TIMEZONE,
+			LATITUDE,
+			LONGITUDE,
+			"CHANGE.USER",
+			"CHANGE.TIMESTAMP"
+		)
+		VALUES (
+		im_code, 
+		im_name,
+		im_city,
+		im_country,
+		im_timezone,
+		im_latitude,
+		im_longitude,
+		CURRENT_USER,
+		CURRENT_TIMESTAMP
+		);
+		
+		log_comment = 'INFO: Record inserted, CODE=' || im_code || ' NAME=' || im_name;
+		log_level = log_level + 1;
+		call "CreateLog" (::CURRENT_OBJECT_NAME, log_level, log_comment, 1);			
+		
+	end if;
+	
+END

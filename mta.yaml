@@ -1,3 +1,33 @@
 ID: ChickenWings
 _schema-version: '2.0'
 version: 0.0.1
+modules:
+ - name: db
+   type: hdb
+   path: db
+   requires:
+    - name: hdi-container
+      properties:
+        TARGET_CONTAINER: ~{hdi-container-name}
+        
+    - name: CrossSchemaSysBi
+      group: SERVICE_REPLACEMENTS
+      properties:
+        key: hdi-sys-bi-service
+        service: ~{sys-bi-service-name}
+        
+resources:
+ - name: hdi-container
+   parameters:
+     config:
+         schema: ChickenWings
+   properties:
+      hdi-container-name: ${service-name}
+   type: com.sap.xs.hdi-container
+
+ - name: CrossSchemaSysBi
+   type: org.cloudfoundry.existing-service
+   parameters:
+     service-name: CROSS_SCHEMA_ABANI
+   properties:
+     sys-bi-service-name: ${service-name}     

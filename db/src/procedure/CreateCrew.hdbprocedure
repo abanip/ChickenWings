@@ -1,0 +1,47 @@
+PROCEDURE "CreateCrew" ( 
+	IN im_fname NVARCHAR(20),
+	IN im_lname NVARCHAR(20),
+	IN im_mobile NVARCHAR(15),
+	IN im_email NVARCHAR(25),
+	IN im_country NVARCHAR(25),
+	IN im_role NVARCHAR(20),
+	OUT ex_error NVARCHAR(100))
+LANGUAGE SQLSCRIPT SQL
+SECURITY INVOKER AS
+BEGIN
+	-- Declare variables
+	-- Log variables
+	declare log_level integer = 0;
+	declare log_err_level integer = -1;
+	declare log_comment nvarchar(1000);
+	
+	-- Insert record
+	INSERT INTO "Crew" (
+		CREWID,
+		FNAME,
+		LNAME,
+		MOBILE,
+		EMAIL,
+		COUNTRY,
+		ROLE,
+		"CHANGE.USER",
+		"CHANGE.TIMESTAMP"
+	)
+	VALUES (
+		"CrewId".NEXTVAL,
+		im_fname, 
+		im_lname,
+		im_mobile,
+		im_email,
+		im_country,
+		im_role,
+		CURRENT_USER,
+		CURRENT_TIMESTAMP
+	);
+	
+	-- Create Log Entry
+	log_comment = 'INFO: Record inserted, FNAME=' || im_fname || ' LNAME=' || im_lname;
+	log_level = log_level + 1;
+	call "CreateLog" (::CURRENT_OBJECT_NAME, log_level, log_comment, 1);	
+		
+END
