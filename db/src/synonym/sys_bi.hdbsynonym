@@ -2,7 +2,7 @@
   "M_TIME_DIMENSION": {
     "target": {
       "object": "M_TIME_DIMENSION",
-      "schema": "ABANI"
+      "schema": "_SYS_BI"
     }
   }
 }
