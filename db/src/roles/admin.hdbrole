@@ -12,7 +12,10 @@
 		    			  "CREATE TEMPORARY TABLE",
 		    			  "TRIGGER"
 		   ]
-		}]
-
+		}],
+    	"schema_analytic_privileges":[ 
+    	{ 
+        "privileges": ["CustomerBooking"]
+    	}] 		
       }
 }
