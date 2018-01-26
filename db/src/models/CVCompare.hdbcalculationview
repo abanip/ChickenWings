@@ -100,7 +100,7 @@
       <mapping xsi:type="Calculation:AttributeMapping" target="DISCOUNT_PY" source="DISCOUNT"/>
       <mapping xsi:type="Calculation:AttributeMapping" target="FEES_PY" source="FEES"/>
     </input>
-    <filter>&quot;YEAR&quot; = '2017'</filter>
+    <filter>&quot;YEAR&quot; = '2016'</filter>
   </calculationView>
   <calculationView xsi:type="Calculation:UnionView" id="Union">
     <viewAttributes>
