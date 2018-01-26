@@ -55,7 +55,7 @@
       <mapping xsi:type="Calculation:AttributeMapping" target="DISCOUNT_CY" source="DISCOUNT"/>
       <mapping xsi:type="Calculation:AttributeMapping" target="FEES_CY" source="FEES"/>
     </input>
-    <filter>&quot;YEAR&quot; = '2018'</filter>
+    <filter>&quot;YEAR&quot; = '2017'</filter>
   </calculationView>
   <calculationView xsi:type="Calculation:ProjectionView" id="P_PY" filterExpressionLanguage="SQL">
     <viewAttributes>
@@ -100,7 +100,7 @@
       <mapping xsi:type="Calculation:AttributeMapping" target="DISCOUNT_PY" source="DISCOUNT"/>
       <mapping xsi:type="Calculation:AttributeMapping" target="FEES_PY" source="FEES"/>
     </input>
-    <filter>&quot;YEAR&quot; = '2008'</filter>
+    <filter>&quot;YEAR&quot; = '2017'</filter>
   </calculationView>
   <calculationView xsi:type="Calculation:UnionView" id="Union">
     <viewAttributes>
